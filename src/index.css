@@ -1,0 +1,192 @@
+@import "tailwindcss";
+
+
+* {
+  letter-spacing: -0.2px;
+}
+
+/* ── Color tokens — light / dark ──────────────────────── */
+:root {
+  --color-base: 30, 31, 32;
+  --bg-card: #ffffff;
+  --bg-canvas: #f4f4f5;
+  --dot-color: #d1d1d6;
+  --border-panel: #e4e4e7;
+  --bg-blur-card: rgba(255,255,255,0.8);
+  --canvas-left: 272px;
+}
+
+/* Mobile-only fixed header */
+.mobile-header {
+  display: none;
+}
+
+/* Mobile controls panel — hidden on desktop */
+.mobile-controls {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  :root {
+    --canvas-left: 0px;
+  }
+
+  .mobile-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    padding: 16px 20px;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border-panel);
+  }
+
+  .desktop-title {
+    display: none;
+  }
+
+  .desktop-controls {
+    display: none !important;
+  }
+
+  .mobile-controls {
+    display: block !important;
+  }
+
+  .layout-root {
+    flex-direction: column !important;
+    padding-top: 68px;
+  }
+
+  .layout-panel {
+    width: 100% !important;
+    flex: none !important;
+    height: auto !important;
+    order: 2;
+    margin: 0 !important;
+  }
+
+  .panel-squircle-outer {
+    clip-path: none !important;
+    border-radius: 20px 20px 0 0 !important;
+    background: transparent !important;
+    padding: 0 !important;
+    border-top: 1px solid var(--border-panel) !important;
+    overflow: hidden !important;
+  }
+
+  .panel-squircle-inner {
+    clip-path: none !important;
+    border-radius: 20px 20px 0 0 !important;
+    overflow: hidden !important;
+  }
+
+  .layout-canvas {
+    flex: 1 !important;
+    order: 1;
+  }
+}
+
+/* Upload empty state — centered on desktop, fixed offset on mobile */
+.upload-empty-state {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+@media (max-width: 767px) {
+  .upload-empty-state {
+    top: 32vh;
+    transform: none;
+  }
+}
+
+/* Make uploaded SVGs fill the preview container */
+#svg-preview-container svg {
+  width: 100%;
+  height: 100%;
+  max-width: 240px;
+  max-height: 240px;
+}
+
+/* ── Light / Dark slider thumb ───────────────────────────── */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: rgb(var(--color-base));
+  cursor: pointer;
+  border: 2px solid var(--bg-card);
+  box-shadow: 0 0 0 1px rgb(var(--color-base));
+}
+input[type="range"]::-moz-range-thumb {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: rgb(var(--color-base));
+  cursor: pointer;
+  border: 2px solid var(--bg-card);
+  box-shadow: 0 0 0 1px rgb(var(--color-base));
+}
+
+/* ── Native theme slider — hidden thumb (custom track used) ── */
+[data-theme="native"] input[type="range"] {
+  height: 20px;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+}
+[data-theme="native"] input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 0;
+  height: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+[data-theme="native"] input[type="range"]::-moz-range-thumb {
+  width: 0;
+  height: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+[data-theme="native"] input[type="range"]::-webkit-slider-runnable-track {
+  background: transparent;
+}
+[data-theme="native"] input[type="range"]::-moz-range-track {
+  background: transparent;
+}
+
+/* Select box hover border */
+.l-select {
+  box-shadow: 0 0 0 1px rgba(var(--color-base), 0);
+  transition: box-shadow 150ms;
+}
+.l-select:hover {
+  box-shadow: 0 0 0 1px rgba(var(--color-base), 0.08);
+}
+
+/* Canvas placeholder entrance animation */
+@keyframes canvas-entrance {
+  0%   { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 1; transform: translateY(0px); }
+}
+.canvas-float {
+  animation: canvas-entrance 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Scrollbar — hidden by default, visible on panel hover */
+.panel-scroll { scrollbar-width: thin; scrollbar-color: transparent transparent; }
+.panel-scroll::-webkit-scrollbar { width: 4px; }
+.panel-scroll::-webkit-scrollbar-track { background: transparent; }
+.panel-scroll::-webkit-scrollbar-thumb { background: transparent; border-radius: 4px; }
+.panel-scroll.panel-scroll-visible { scrollbar-color: rgba(var(--color-base), 0.2) transparent; }
+.panel-scroll.panel-scroll-visible::-webkit-scrollbar-thumb { background: rgba(var(--color-base), 0.2); }

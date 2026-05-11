@@ -1,0 +1,149 @@
+.export-divider {
+  height: 1px;
+  background: rgba(var(--color-base), var(--op-section-div, 0.06));
+}
+
+.export-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.export-header-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(var(--color-base), var(--op-heading, 0.85));
+}
+
+.export-header-arrow {
+  height: 7px;
+  transition: transform 200ms;
+}
+
+.export-header-arrow.closed {
+  transform: rotate(-90deg);
+}
+
+.export-body {
+  padding: 0 12px 12px;
+}
+
+.export-container {
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  background: rgba(var(--color-base), var(--op-surface, 0.08));
+}
+
+.export-category-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 40px;
+  padding: 0 10px 0 12px;
+  box-sizing: border-box;
+}
+
+.export-label {
+  font-size: 14px;
+  color: rgba(var(--color-base), var(--op-label, 0.65));
+  letter-spacing: -0.2px;
+}
+
+.export-select-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  overflow: hidden;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--bg-card);
+}
+
+.export-select-text {
+  pointer-events: none;
+  white-space: nowrap;
+  padding: 0 27px 0 9px;
+  font-size: 14px;
+  color: rgba(var(--color-base), var(--op-label, 0.65));
+  letter-spacing: -0.2px;
+}
+
+.export-select-arrow {
+  pointer-events: none;
+  position: absolute;
+  right: 9px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.export-select-arrow img {
+  height: 13px;
+}
+
+.export-select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.export-btn-row {
+  height: 40px;
+  padding-left: 12px;
+  padding-right: 10px;
+  box-sizing: border-box;
+}
+
+.export-btn {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
+  border-radius: 8px;
+  border: none;
+  height: 32px;
+  min-height: 32px;
+  max-height: 32px;
+  padding: 0 10px 0 12px;
+  cursor: pointer;
+  box-sizing: border-box;
+  background: var(--bg-card);
+  font-size: 14px;
+  color: rgba(var(--color-base), 0.8);
+  letter-spacing: -0.2px;
+}
+
+.export-btn:disabled {
+  cursor: not-allowed;
+  color: rgba(var(--color-base), var(--op-heading, 0.4));
+}
+
+.export-btn.copied {
+  color: #000000;
+}
+
+.export-btn-progress {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.1);
+  transition: width 100ms;
+}
+
+.export-btn-label {
+  position: relative;
+}
+
+.export-btn-icon {
+  position: relative;
+}
