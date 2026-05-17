@@ -79,7 +79,7 @@ export default function ExportPanel({ config, previewRef, hasSVG, fileName, bare
             {categories.find(c => c.id === category)?.label}
           </span>
           <div className="export-select-arrow">
-            <img src="/dropdown.svg" alt="" />
+            <img src={import.meta.env.BASE_URL + 'dropdown.svg'} alt="" />
           </div>
           <select className="export-select" value={category} onChange={e => setCategory(e.target.value)}>
             {categories.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
@@ -101,7 +101,7 @@ export default function ExportPanel({ config, previewRef, hasSVG, fileName, bare
               {btn.busy ? `${btn.progress ?? 0}%` : btn.copied ? 'Copied!' : btn.downloaded ? 'Downloaded!' : btn.label}
             </span>
             <img
-              src={btn.copied || btn.downloaded ? '/done.svg' : `/${btn.icon}.svg`}
+              src={import.meta.env.BASE_URL + (btn.copied || btn.downloaded ? 'done.svg' : `${btn.icon}.svg`)}
               alt=""
               className="export-btn-icon"
               style={{ opacity: !hasSVG || btn.busy ? 0.4 : 1 }}
@@ -120,7 +120,7 @@ export default function ExportPanel({ config, previewRef, hasSVG, fileName, bare
 
       <button className="export-header" onClick={() => setOpen(p => !p)}>
         <span className="export-header-title">Export</span>
-        <img src="/arrow.svg" alt="" className={`export-header-arrow ${open ? '' : 'closed'}`} />
+        <img src={import.meta.env.BASE_URL + 'arrow.svg'} alt="" className={`export-header-arrow ${open ? '' : 'closed'}`} />
       </button>
 
       {open && (

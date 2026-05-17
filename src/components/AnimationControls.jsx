@@ -56,7 +56,7 @@ function LSection({ title, children, open, onToggle }) {
       <div style={{ height: '1px', background: `rgba(${B}, var(--op-section-div, 0.06))` }} />
       <button onClick={onToggle} className="w-full flex items-center justify-between px-3 py-2.5">
         <span className="text-sm font-medium" style={{ color: `rgba(${B}, var(--op-heading, 0.85))` }}>{title}</span>
-        <img src="/arrow.svg" alt="" style={{ height: '7px' }} className={`transition-transform duration-200 ${open ? '' : '-rotate-90'}`} />
+        <img src={import.meta.env.BASE_URL + 'arrow.svg'} alt="" style={{ height: '7px' }} className={`transition-transform duration-200 ${open ? '' : '-rotate-90'}`} />
       </button>
       {open && <div className="px-3 pb-3">{children}</div>}
     </div>
@@ -101,7 +101,7 @@ function LSelect({ value, onChange, options }) {
     <div className="l-select relative inline-flex items-center overflow-hidden" style={{ height: '28px', background: 'var(--bg-card)', borderRadius: '8px' }}>
       <span className="pointer-events-none whitespace-nowrap" style={{ paddingLeft: '9px', paddingRight: '27px', ...rowText }}>{label}</span>
       <div className="pointer-events-none absolute" style={{ right: '9px', top: '50%', transform: 'translateY(-50%)' }}>
-        <img src="/dropdown.svg" alt="" style={{ height: '13px' }} />
+        <img src={import.meta.env.BASE_URL + 'dropdown.svg'} alt="" style={{ height: '13px' }} />
       </div>
       <select
         value={value}
@@ -165,7 +165,7 @@ export default function AnimationControls({ config, onChange, onPlay, onPause, i
           className={!hasSVG ? 'cursor-not-allowed' : ''}
         >
           <img
-            src={!hasSVG ? '/disabled-play.svg' : isPlaying ? '/pause.svg' : '/play.svg'}
+            src={import.meta.env.BASE_URL + (!hasSVG ? 'disabled-play.svg' : isPlaying ? 'pause.svg' : 'play.svg')}
             alt={isPlaying ? 'Pause' : 'Play'}
             style={{ width: '24px', height: '24px' }}
           />

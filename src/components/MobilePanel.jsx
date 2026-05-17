@@ -77,7 +77,7 @@ function LSelect({ value, onChange, options }) {
     <div className="l-select" style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', overflow: 'hidden', height: '28px', background: 'var(--bg-card)', borderRadius: '8px' }}>
       <span style={{ pointerEvents: 'none', whiteSpace: 'nowrap', paddingLeft: '9px', paddingRight: '27px', ...rowText }}>{label}</span>
       <div style={{ pointerEvents: 'none', position: 'absolute', right: '9px', top: '50%', transform: 'translateY(-50%)' }}>
-        <img src="/dropdown.svg" alt="" style={{ height: '13px' }} />
+        <img src={import.meta.env.BASE_URL + 'dropdown.svg'} alt="" style={{ height: '13px' }} />
       </div>
       <select value={value} onChange={e => onChange(e.target.value)}
         style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer' }}>
@@ -112,11 +112,12 @@ function LToggle({ value, onChange }) {
   )
 }
 
+const BASE = import.meta.env.BASE_URL
 const TABS = [
-  { id: 'configure', label: 'Configure', icon: '/bottom-configure.svg' },
-  { id: 'timing',    label: 'Timing',    icon: '/bottom-timing.svg' },
-  { id: 'playback',  label: 'Playback',  icon: '/bottom-playback.svg' },
-  { id: 'export',    label: 'Export',    icon: '/bottom-export.svg' },
+  { id: 'configure', label: 'Configure', icon: `${BASE}bottom-configure.svg` },
+  { id: 'timing',    label: 'Timing',    icon: `${BASE}bottom-timing.svg` },
+  { id: 'playback',  label: 'Playback',  icon: `${BASE}bottom-playback.svg` },
+  { id: 'export',    label: 'Export',    icon: `${BASE}bottom-export.svg` },
 ]
 
 export default function MobilePanel({ config, onChange, previewRef, hasSVG, fileName }) {

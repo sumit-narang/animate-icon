@@ -60,7 +60,7 @@ export default function App() {
             onClick={() => canvasInputRef.current?.click()}
             style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', marginRight: '8px' }}
           >
-            <img src="/upload.svg" alt="Upload" style={{ width: 'auto', height: '21px', display: 'block' }} />
+            <img src={import.meta.env.BASE_URL + 'upload.svg'} alt="Upload" style={{ width: 'auto', height: '21px', display: 'block' }} />
           </button>
           <button
             onClick={isPlaying ? handlePause : handlePlay}
@@ -68,7 +68,7 @@ export default function App() {
             style={{ background: 'none', border: 'none', padding: 0, cursor: svgString ? 'pointer' : 'not-allowed' }}
           >
             <img
-              src={!svgString ? '/disabled-play.svg' : isPlaying ? '/pause.svg' : '/play.svg'}
+              src={import.meta.env.BASE_URL + (!svgString ? 'disabled-play.svg' : isPlaying ? 'pause.svg' : 'play.svg')}
               alt={isPlaying ? 'Pause' : 'Play'}
               style={{ width: '24px', height: '24px', display: 'block' }}
             />
@@ -185,7 +185,7 @@ export default function App() {
                 <input ref={canvasInputRef} type="file" accept=".svg,image/svg+xml" style={{ display: 'none' }}
                   onChange={(e) => { readCanvasFile(e.target.files[0]); e.target.value = '' }} />
                 <div className="upload-empty-state" style={{ position: 'absolute', left: 0, right: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', pointerEvents: 'none' }}>
-                  <img src="/upload.svg" alt="" />
+                  <img src={import.meta.env.BASE_URL + 'upload.svg'} alt="" />
                   <div style={{ textAlign: 'center' }}>
                     <p style={{ fontSize: '14px', fontWeight: 500, color: 'rgba(var(--color-base),0.85)' }}>
                       {canvasDragging ? 'Drop SVG here' : 'Upload SVG'}

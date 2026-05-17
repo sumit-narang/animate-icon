@@ -51,7 +51,7 @@ export default function SVGUploader({ onUpload }) {
           className="hidden"
         />
 
-        <img src="/upload.svg" alt="" className="w-5 h-5" />
+        <img src={import.meta.env.BASE_URL + 'upload.svg'} alt="" className="w-5 h-5" />
 
         <div className="text-center">
           <p className="text-sm font-medium" style={{ color: 'rgba(var(--color-base),0.85)' }}>
