@@ -77,17 +77,17 @@ export default function App() {
       </div>
 
       {/* ── Layout ──────────────────────────────────────────── */}
-      <div className="layout-root" style={{ display: 'flex', height: '100vh', boxSizing: 'border-box' }}>
+      <div className="layout-root" style={{ display: 'flex', height: '100dvh', boxSizing: 'border-box' }}>
 
         {/* ── Controls panel ─────────────────────────────────── */}
-        <div className="layout-panel" style={{ width: '260px', flexShrink: 0, margin: '12px 0 12px 12px', display: 'flex', flexDirection: 'column' }}>
+        <div className="layout-panel" style={{ width: '260px', flexShrink: 0, margin: '12px 0 12px 12px', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
           <Squircle cornerRadius={20} cornerSmoothing={1}
             className="panel-squircle-outer"
-            style={{ flex: 1, background: '#e4e4e7', padding: '1px', display: 'flex', flexDirection: 'column' }}
+            style={{ flex: 1, background: '#e4e4e7', padding: '1px', display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0 }}
           >
             <Squircle cornerRadius={20} cornerSmoothing={1}
               className="panel-squircle-inner"
-              style={{ flex: 1, background: 'white', display: 'flex', flexDirection: 'column', minHeight: 0 }}
+              style={{ flex: 1, background: 'white', display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }}
             >
               {/* Desktop controls */}
               <div
