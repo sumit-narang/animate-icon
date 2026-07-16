@@ -203,7 +203,7 @@ export default function AnimationControls({ config, onChange, onPlay, onPause, i
           onClick={isPlaying ? onPause : onPlay}
           disabled={!hasSVG}
           title={isPlaying ? 'Pause' : 'Play'}
-          className={!hasSVG ? 'cursor-not-allowed' : ''}
+          className={hasSVG ? 'cursor-pointer' : 'cursor-not-allowed'}
         >
           <img
             src={import.meta.env.BASE_URL + (!hasSVG ? 'disabled-play.svg' : isPlaying ? 'pause.svg' : 'play.svg')}
