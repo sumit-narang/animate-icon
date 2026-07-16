@@ -10,11 +10,16 @@ const DEFAULT_CONFIG = {
   type: 'spin',
   trigger: 'auto',
   easing: 'power2.inOut',
+  customEase: [0.4, 0, 0.2, 1], // cubic-bezier control points (used when easing === 'custom')
+  origin: 'center',             // transform-origin anchor for rotate/scale animations
   duration: 1.2,
   delay: 0,
   stagger: 0.08,
   intensity: 1,
-  loop: true,
+  loop: true,                   // infinite repeat
+  repeat: 3,                    // finite repeat count (used when loop is off)
+  repeatDelay: 0,               // pause between repeats
+  direction: 'normal',          // 'normal' | 'reverse'
   yoyo: false,
   strokeColor: '#6366f1',
   strokeWidth: 2,

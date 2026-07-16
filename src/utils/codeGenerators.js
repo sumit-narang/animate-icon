@@ -9,28 +9,97 @@ const EASING_TO_CSS = {
   'circ.inOut': 'cubic-bezier(0.785, 0.135, 0.15, 0.86)',
 }
 
-function cssEase(easing) {
-  return EASING_TO_CSS[easing] ?? 'ease-in-out'
+// transform-origin anchor mappings (shared by preview + generators)
+export const ORIGIN_GSAP = {
+  center: '50% 50%',
+  top: '50% 0%',
+  bottom: '50% 100%',
+  left: '0% 50%',
+  right: '100% 50%',
+  'top-left': '0% 0%',
+  'top-right': '100% 0%',
+  'bottom-left': '0% 100%',
+  'bottom-right': '100% 100%',
+}
+export const ORIGIN_CSS = {
+  center: 'center',
+  top: 'center top',
+  bottom: 'center bottom',
+  left: 'left center',
+  right: 'right center',
+  'top-left': 'left top',
+  'top-right': 'right top',
+  'bottom-left': 'left bottom',
+  'bottom-right': 'right bottom',
 }
 
-function iterationCount(loop, yoyo) {
-  if (loop) return 'infinite'
-  return yoyo ? '2' : '1'
+function originCss(config) {
+  return ORIGIN_CSS[config.origin] ?? 'center'
+}
+function originGsap(config) {
+  return ORIGIN_GSAP[config.origin] ?? '50% 50%'
 }
 
-function direction(yoyo) {
-  return yoyo ? 'alternate' : 'normal'
+function cssEase(config) {
+  if (config.easing === 'custom') {
+    const [a, b, c, d] = config.customEase ?? [0.4, 0, 0.2, 1]
+    return `cubic-bezier(${a}, ${b}, ${c}, ${d})`
+  }
+  return EASING_TO_CSS[config.easing] ?? 'ease-in-out'
+}
+
+// GSAP ease as a code string. Custom eases reference a CustomEase created in the header.
+function gsapEase(config) {
+  return config.easing === 'custom' ? 'customEase' : `'${config.easing}'`
+}
+function gsapCustomEaseHeader(config) {
+  if (config.easing !== 'custom') return ''
+  const [a, b, c, d] = config.customEase ?? [0.4, 0, 0.2, 1]
+  return `import { CustomEase } from 'gsap/CustomEase'
+gsap.registerPlugin(CustomEase)
+
+const customEase = CustomEase.create('custom', 'M0,0 C${a},${b} ${c},${d} 1,1')
+`
+}
+
+function cssIterations(config) {
+  return config.loop ? 'infinite' : String((config.repeat ?? 0) + 1)
+}
+
+function cssDirection(config) {
+  const rev = config.direction === 'reverse'
+  if (config.yoyo) return rev ? 'alternate-reverse' : 'alternate'
+  return rev ? 'reverse' : 'normal'
+}
+
+// CSS animations can't pause between iterations — flag it so the export is honest.
+function repeatDelayNote(config) {
+  return config.repeatDelay > 0
+    ? `/* Note: repeat delay (${config.repeatDelay}s) isn't supported by CSS animations — use the GSAP export for that. */\n\n`
+    : ''
+}
+
+function gsapRepeat(config) {
+  return config.loop ? -1 : (config.repeat ?? 0)
+}
+// GSAP: play a (looping) animation in reverse by seeking to the end and inverting time.
+function gsapReverse(varName, config) {
+  return config.direction === 'reverse'
+    ? `\n\n${varName}.progress(1).timeScale(-1) // play in reverse`
+    : ''
 }
 
 export function generateCSS(config) {
-  const { type, duration, easing, loop, yoyo, strokeColor, strokeWidth, stagger, intensity } = config
-  const ease = cssEase(easing)
-  const iter = iterationCount(loop, yoyo)
-  const dir  = direction(yoyo)
+  const { type, duration, strokeColor, strokeWidth, stagger, intensity } = config
+  const ease = cssEase(config)
+  const iter = cssIterations(config)
+  const dir  = cssDirection(config)
+  const org  = originCss(config)
+  const note = repeatDelayNote(config)
 
   switch (type) {
     case 'draw':
-      return `/* 1. Measure each path's length in JS:
+      return `${note}/* 1. Measure each path's length in JS:
    el.style.setProperty('--len', el.getTotalLength()) */
 
 .icon path,
@@ -59,10 +128,10 @@ export function generateCSS(config) {
 /* …add more as needed */`
 
     case 'spin':
-      return `.icon {
+      return `${note}.icon {
   transform-box: fill-box;
-  transform-origin: center;
-  animation: svg-spin ${duration}s linear ${iter};
+  transform-origin: ${org};
+  animation: svg-spin ${duration}s linear ${iter} ${dir};
 }
 
 @keyframes svg-spin {
@@ -72,7 +141,9 @@ export function generateCSS(config) {
 
     case 'bounce': {
       const dist = Math.round(20 * intensity)
-      return `.icon {
+      return `${note}.icon {
+  transform-box: fill-box;
+  transform-origin: ${org};
   animation: svg-bounce ${duration}s ${ease} ${iter} ${dir};
 }
 
@@ -84,9 +155,9 @@ export function generateCSS(config) {
 
     case 'pulse': {
       const s = (1 + 0.25 * intensity).toFixed(2)
-      return `.icon {
+      return `${note}.icon {
   transform-box: fill-box;
-  transform-origin: center;
+  transform-origin: ${org};
   animation: svg-pulse ${duration}s ${ease} ${iter} ${dir};
 }
 
@@ -97,7 +168,7 @@ export function generateCSS(config) {
     }
 
     case 'fade':
-      return `.icon {
+      return `${note}.icon {
   animation: svg-fade ${duration}s ${ease} ${iter} ${dir};
 }
 
@@ -108,10 +179,10 @@ export function generateCSS(config) {
 
     case 'wiggle': {
       const deg = Math.round(15 * intensity)
-      return `.icon {
+      return `${note}.icon {
   transform-box: fill-box;
-  transform-origin: center bottom;
-  animation: svg-wiggle ${duration}s ${ease} ${iter};
+  transform-origin: ${org};
+  animation: svg-wiggle ${duration}s ${ease} ${iter} ${dir};
 }
 
 @keyframes svg-wiggle {
@@ -124,8 +195,8 @@ export function generateCSS(config) {
 
     case 'shake': {
       const dist = Math.round(8 * intensity)
-      return `.icon {
-  animation: svg-shake ${duration}s ${ease} ${iter};
+      return `${note}.icon {
+  animation: svg-shake ${duration}s ${ease} ${iter} ${dir};
 }
 
 @keyframes svg-shake {
@@ -139,9 +210,9 @@ export function generateCSS(config) {
     }
 
     case 'flip':
-      return `.icon {
+      return `${note}.icon {
   transform-box: fill-box;
-  transform-origin: center;
+  transform-origin: ${org};
   animation: svg-flip ${duration}s ${ease} ${iter} ${dir};
 }
 
@@ -156,11 +227,14 @@ export function generateCSS(config) {
 }
 
 export function generateGSAP(config) {
-  const { type, duration, easing, loop, yoyo, delay, stagger, strokeColor, strokeWidth, intensity } = config
-  const repeat = loop ? -1 : 0
+  const { type, duration, delay, stagger, strokeColor, strokeWidth, intensity, repeatDelay } = config
+  const repeat = gsapRepeat(config)
+  const ease = gsapEase(config)
+  const org = originGsap(config)
+  const rd = repeatDelay || 0
 
   const header = `import gsap from 'gsap'
-
+${gsapCustomEaseHeader(config)}
 const icon = document.querySelector('.icon') // your SVG element
 `
 
@@ -180,103 +254,110 @@ paths.forEach((el) => {
 })
 
 // Animate
-const tl = gsap.timeline({ repeat: ${repeat}, yoyo: ${yoyo}, delay: ${delay} })
+const tl = gsap.timeline({ repeat: ${repeat}, repeatDelay: ${rd}, yoyo: ${config.yoyo}, delay: ${delay} })
 
 paths.forEach((el, i) => {
   tl.to(el, {
     strokeDashoffset: 0,
     duration: ${duration},
-    ease: '${easing}',
+    ease: ${ease},
   }, i * ${stagger})
-})`
+})${gsapReverse('tl', config)}`
 
     case 'spin':
       return `${header}
-gsap.set(icon, { transformOrigin: '50% 50%', transformBox: 'fill-box' })
+gsap.set(icon, { transformOrigin: '${org}', transformBox: 'fill-box' })
 
-gsap.to(icon, {
+const anim = gsap.to(icon, {
   rotation: 360,
   duration: ${duration},
   ease: 'none',
   repeat: ${repeat},
+  repeatDelay: ${rd},
   delay: ${delay},
-})`
+})${gsapReverse('anim', config)}`
 
     case 'bounce': {
       const dist = 20 * intensity
       return `${header}
-gsap.to(icon, {
+gsap.set(icon, { transformOrigin: '${org}', transformBox: 'fill-box' })
+
+const anim = gsap.to(icon, {
   y: ${-dist},
   duration: ${(duration / 2).toFixed(2)},
   ease: 'power2.out',
   yoyo: true,
-  repeat: ${repeat},
+  repeat: ${repeat < 0 ? -1 : repeat * 2 + 1},
+  repeatDelay: ${rd},
   delay: ${delay},
-})`
+})${gsapReverse('anim', config)}`
     }
 
     case 'pulse': {
       const s = 1 + 0.25 * intensity
       return `${header}
-gsap.set(icon, { transformOrigin: '50% 50%', transformBox: 'fill-box' })
+gsap.set(icon, { transformOrigin: '${org}', transformBox: 'fill-box' })
 
-gsap.to(icon, {
+const anim = gsap.to(icon, {
   scale: ${s.toFixed(2)},
   duration: ${(duration / 2).toFixed(2)},
   ease: 'power2.inOut',
   yoyo: true,
-  repeat: ${repeat},
+  repeat: ${repeat < 0 ? -1 : repeat * 2 + 1},
+  repeatDelay: ${rd},
   delay: ${delay},
-})`
+})${gsapReverse('anim', config)}`
     }
 
     case 'fade':
       return `${header}
-gsap.fromTo(icon,
+const anim = gsap.fromTo(icon,
   { opacity: 0 },
   {
     opacity: 1,
     duration: ${duration},
-    ease: '${easing}',
+    ease: ${ease},
     repeat: ${repeat},
-    yoyo: ${yoyo || loop},
+    repeatDelay: ${rd},
+    yoyo: ${config.yoyo || config.loop},
     delay: ${delay},
   }
-)`
+)${gsapReverse('anim', config)}`
 
     case 'wiggle': {
       const deg = 15 * intensity
       return `${header}
-gsap.set(icon, { transformOrigin: '50% 100%', transformBox: 'fill-box' })
+gsap.set(icon, { transformOrigin: '${org}', transformBox: 'fill-box' })
 
-const tl = gsap.timeline({ repeat: ${repeat}, delay: ${delay} })
+const tl = gsap.timeline({ repeat: ${repeat}, repeatDelay: ${rd}, delay: ${delay} })
 tl.to(icon, { rotation: ${deg},   duration: ${(duration / 4).toFixed(2)}, ease: 'power1.inOut' })
   .to(icon, { rotation: ${-deg},  duration: ${(duration / 2).toFixed(2)}, ease: 'power1.inOut' })
-  .to(icon, { rotation: 0,        duration: ${(duration / 4).toFixed(2)}, ease: 'power1.inOut' })`
+  .to(icon, { rotation: 0,        duration: ${(duration / 4).toFixed(2)}, ease: 'power1.inOut' })${gsapReverse('tl', config)}`
     }
 
     case 'shake': {
       const dist = 8 * intensity
       return `${header}
-const tl = gsap.timeline({ repeat: ${repeat}, delay: ${delay} })
+const tl = gsap.timeline({ repeat: ${repeat}, repeatDelay: ${rd}, delay: ${delay} })
 tl.to(icon, { x:  ${dist},  duration: ${(duration / 6).toFixed(2)}, ease: 'power1.inOut' })
   .to(icon, { x: ${-dist},  duration: ${(duration / 3).toFixed(2)}, ease: 'power1.inOut' })
   .to(icon, { x:  ${dist},  duration: ${(duration / 3).toFixed(2)}, ease: 'power1.inOut' })
-  .to(icon, { x:  0,        duration: ${(duration / 6).toFixed(2)}, ease: 'power1.inOut' })`
+  .to(icon, { x:  0,        duration: ${(duration / 6).toFixed(2)}, ease: 'power1.inOut' })${gsapReverse('tl', config)}`
     }
 
     case 'flip':
       return `${header}
-gsap.set(icon, { transformOrigin: '50% 50%', transformBox: 'fill-box' })
+gsap.set(icon, { transformOrigin: '${org}', transformBox: 'fill-box' })
 
-gsap.to(icon, {
+const anim = gsap.to(icon, {
   rotationY: 360,
   duration: ${duration},
-  ease: '${easing}',
+  ease: ${ease},
   repeat: ${repeat},
-  yoyo: ${yoyo},
+  repeatDelay: ${rd},
+  yoyo: ${config.yoyo},
   delay: ${delay},
-})`
+})${gsapReverse('anim', config)}`
 
     default:
       return '// No GSAP code for this animation type'
@@ -294,14 +375,12 @@ gsap.to(icon, {
  * @returns {string|null}          - Serialized SVG string, or null on parse error
  */
 export function generateEmbeddedSVG(liveSvgEl, svgString, config) {
-  const {
-    type, duration, easing, loop, yoyo,
-    delay, stagger, intensity, strokeColor, strokeWidth,
-  } = config
+  const { type, duration, delay, stagger, intensity, strokeColor, strokeWidth } = config
 
-  const ease = cssEase(easing)
-  const iter = iterationCount(loop, yoyo)
-  const dir  = direction(yoyo)
+  const ease = cssEase(config)
+  const iter = cssIterations(config)
+  const dir  = cssDirection(config)
+  const org  = originCss(config)
 
   // Parse a clean copy of the SVG (no GSAP inline styles)
   const parser = new DOMParser()
@@ -337,20 +416,20 @@ export function generateEmbeddedSVG(liveSvgEl, svgString, config) {
 
     switch (type) {
       case 'spin':
-        css = `._sa{transform-box:fill-box;transform-origin:center;animation:_spin ${duration}s linear ${iter}}` +
+        css = `._sa{transform-box:fill-box;transform-origin:${org};animation:_spin ${duration}s linear ${iter} ${dir}}` +
               `@keyframes _spin{to{transform:rotate(360deg)}}`
         break
 
       case 'bounce': {
         const dist = Math.round(20 * intensity)
-        css = `._sa{animation:_bounce ${duration}s ${ease} ${iter} alternate}` +
+        css = `._sa{transform-box:fill-box;transform-origin:${org};animation:_bounce ${duration}s ${ease} ${iter} ${dir}}` +
               `@keyframes _bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-${dist}px)}}`
         break
       }
 
       case 'pulse': {
         const s = (1 + 0.25 * intensity).toFixed(2)
-        css = `._sa{transform-box:fill-box;transform-origin:center;animation:_pulse ${duration}s ${ease} ${iter} alternate}` +
+        css = `._sa{transform-box:fill-box;transform-origin:${org};animation:_pulse ${duration}s ${ease} ${iter} ${dir}}` +
               `@keyframes _pulse{0%,100%{transform:scale(1)}50%{transform:scale(${s})}}`
         break
       }
@@ -362,20 +441,20 @@ export function generateEmbeddedSVG(liveSvgEl, svgString, config) {
 
       case 'wiggle': {
         const deg = Math.round(15 * intensity)
-        css = `._sa{transform-box:fill-box;transform-origin:center bottom;animation:_wiggle ${duration}s ${ease} ${iter}}` +
+        css = `._sa{transform-box:fill-box;transform-origin:${org};animation:_wiggle ${duration}s ${ease} ${iter} ${dir}}` +
               `@keyframes _wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(${deg}deg)}75%{transform:rotate(${-deg}deg)}}`
         break
       }
 
       case 'shake': {
         const dist = Math.round(8 * intensity)
-        css = `._sa{animation:_shake ${duration}s ${ease} ${iter}}` +
+        css = `._sa{animation:_shake ${duration}s ${ease} ${iter} ${dir}}` +
               `@keyframes _shake{0%,100%{transform:translateX(0)}16%{transform:translateX(${dist}px)}33%{transform:translateX(${-dist}px)}50%{transform:translateX(${dist}px)}66%{transform:translateX(${-dist}px)}83%{transform:translateX(${dist}px)}}`
         break
       }
 
       case 'flip':
-        css = `._sa{transform-box:fill-box;transform-origin:center;animation:_flip ${duration}s ${ease} ${iter} ${dir}}` +
+        css = `._sa{transform-box:fill-box;transform-origin:${org};animation:_flip ${duration}s ${ease} ${iter} ${dir}}` +
               `@keyframes _flip{from{transform:rotateY(0)}to{transform:rotateY(360deg)}}`
         break
 

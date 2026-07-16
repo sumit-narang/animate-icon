@@ -21,12 +21,30 @@ const EASINGS = [
   { value: 'bounce.out',          label: 'Bounce' },
   { value: 'back.out(1.7)',       label: 'Back' },
   { value: 'circ.inOut',          label: 'Circular' },
+  { value: 'custom',              label: 'Custom…' },
 ]
 
 const TRIGGERS = [
   { id: 'auto',  label: 'Auto' },
   { id: 'hover', label: 'Hover' },
   { id: 'click', label: 'Click' },
+]
+
+const ORIGINS = [
+  { value: 'center',       label: 'Center' },
+  { value: 'top',          label: 'Top' },
+  { value: 'bottom',       label: 'Bottom' },
+  { value: 'left',         label: 'Left' },
+  { value: 'right',        label: 'Right' },
+  { value: 'top-left',     label: 'Top Left' },
+  { value: 'top-right',    label: 'Top Right' },
+  { value: 'bottom-left',  label: 'Bottom Left' },
+  { value: 'bottom-right', label: 'Bottom Right' },
+]
+
+const DIRECTIONS = [
+  { value: 'normal',  label: 'Normal' },
+  { value: 'reverse', label: 'Reverse' },
 ]
 
 const B = 'var(--color-base)'
@@ -114,6 +132,29 @@ function LSelect({ value, onChange, options }) {
   )
 }
 
+function LBezierRow({ value, onChange }) {
+  const v = value ?? [0.4, 0, 0.2, 1]
+  const setAt = (i, n) => { const next = [...v]; next[i] = n; onChange(next) }
+  return (
+    <div className="flex items-center justify-between" style={{ height: '40px', paddingLeft: '12px', paddingRight: '10px' }}>
+      <span style={rowText}>Curve</span>
+      <div className="flex items-center gap-1">
+        {v.map((n, i) => (
+          <input
+            key={i}
+            type="number"
+            step="0.05"
+            value={n}
+            onChange={e => setAt(i, parseFloat(e.target.value) || 0)}
+            className="tabular-nums"
+            style={{ width: '40px', height: '26px', background: 'var(--bg-card)', borderRadius: '7px', textAlign: 'center', border: 'none', outline: 'none', fontFamily: 'monospace', ...rowText }}
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
+
 function LToggle({ value, onChange }) {
   return (
     <Squircle asChild cornerRadius={10} cornerSmoothing={1}>
@@ -184,6 +225,12 @@ export default function AnimationControls({ config, onChange, onPlay, onPause, i
           <LRow label="Easing">
             <LSelect value={config.easing} onChange={v => set('easing', v)} options={EASINGS.map(e => ({ value: e.value, label: e.label }))} />
           </LRow>
+          {config.easing === 'custom' && (
+            <LBezierRow value={config.customEase} onChange={v => set('customEase', v)} />
+          )}
+          <LRow label="Anchor">
+            <LSelect value={config.origin} onChange={v => set('origin', v)} options={ORIGINS.map(o => ({ value: o.value, label: o.label }))} />
+          </LRow>
         </LContainer>
       </LSection>
 
@@ -201,6 +248,13 @@ export default function AnimationControls({ config, onChange, onPlay, onPause, i
       <LSection title="Playback" open={open.playback} onToggle={() => toggle('playback')}>
         <LContainer>
           <LRow label="Loop"><LToggle value={config.loop} onChange={v => set('loop', v)} /></LRow>
+          {!config.loop && (
+            <LSliderRow label="Repeat" value={config.repeat} min={0} max={10} step={1} unit="×" onChange={v => set('repeat', v)} />
+          )}
+          <LSliderRow label="Repeat Delay" value={config.repeatDelay} min={0} max={3} step={0.1} unit="s" onChange={v => set('repeatDelay', v)} />
+          <LRow label="Direction">
+            <LSelect value={config.direction} onChange={v => set('direction', v)} options={DIRECTIONS.map(d => ({ value: d.value, label: d.label }))} />
+          </LRow>
           <LRow label="Yoyo"><LToggle value={config.yoyo} onChange={v => set('yoyo', v)} /></LRow>
         </LContainer>
       </LSection>
