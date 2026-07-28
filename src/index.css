@@ -5,6 +5,15 @@
   letter-spacing: -0.2px;
 }
 
+/* Single-screen app — the page itself never scrolls. Locking it keeps the
+   fixed header and the bottom tab bar pinned (prevents iOS rubber-band from
+   scrolling the non-fixed content away). Inner panels scroll on their own. */
+html, body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
 /* ── Color tokens — light / dark ──────────────────────── */
 :root {
   --color-base: 30, 31, 32;
