@@ -3,7 +3,7 @@ import { Squircle } from '@squircle-js/react'
 import ExportPanel from './ExportPanel'
 
 const ANIMATION_TYPES = [
-  { id: 'spin', label: 'Spin' }, { id: 'draw', label: 'Draw' },
+  { id: 'draw', label: 'Draw' }, { id: 'spin', label: 'Spin' },
   { id: 'bounce', label: 'Bounce' }, { id: 'pulse', label: 'Pulse' },
   { id: 'fade', label: 'Fade' }, { id: 'wiggle', label: 'Wiggle' },
   { id: 'shake', label: 'Shake' }, { id: 'flip', label: 'Flip' },
@@ -22,6 +22,21 @@ const TRIGGERS = [
   { id: 'auto',  label: 'Auto' },
   { id: 'hover', label: 'Hover' },
   { id: 'click', label: 'Click' },
+]
+const ORIGINS = [
+  { value: 'center',       label: 'Center' },
+  { value: 'top',          label: 'Top' },
+  { value: 'bottom',       label: 'Bottom' },
+  { value: 'left',         label: 'Left' },
+  { value: 'right',        label: 'Right' },
+  { value: 'top-left',     label: 'Top Left' },
+  { value: 'top-right',    label: 'Top Right' },
+  { value: 'bottom-left',  label: 'Bottom Left' },
+  { value: 'bottom-right', label: 'Bottom Right' },
+]
+const DIRECTIONS = [
+  { value: 'normal',  label: 'Normal' },
+  { value: 'reverse', label: 'Reverse' },
 ]
 
 const B = 'var(--color-base)'
@@ -140,6 +155,9 @@ export default function MobilePanel({ config, onChange, previewRef, hasSVG, file
             <LRow label="Easing">
               <LSelect value={config.easing} onChange={v => set('easing', v)} options={EASINGS.map(e => ({ value: e.value, label: e.label }))} />
             </LRow>
+            <LRow label="Anchor">
+              <LSelect value={config.origin} onChange={v => set('origin', v)} options={ORIGINS.map(o => ({ value: o.value, label: o.label }))} />
+            </LRow>
           </LContainer>
         )}
 
@@ -155,6 +173,13 @@ export default function MobilePanel({ config, onChange, previewRef, hasSVG, file
         {activeTab === 'playback' && (
           <LContainer>
             <LRow label="Loop"><LToggle value={config.loop} onChange={v => set('loop', v)} /></LRow>
+            {!config.loop && (
+              <LSliderRow label="Repeat" value={config.repeat} min={0} max={10} step={1} unit="×" onChange={v => set('repeat', v)} />
+            )}
+            <LSliderRow label="Repeat Delay" value={config.repeatDelay} min={0} max={3} step={0.1} unit="s" onChange={v => set('repeatDelay', v)} />
+            <LRow label="Direction">
+              <LSelect value={config.direction} onChange={v => set('direction', v)} options={DIRECTIONS.map(d => ({ value: d.value, label: d.label }))} />
+            </LRow>
             <LRow label="Yoyo"><LToggle value={config.yoyo} onChange={v => set('yoyo', v)} /></LRow>
           </LContainer>
         )}

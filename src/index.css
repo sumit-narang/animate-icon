@@ -60,6 +60,10 @@
   .layout-root {
     flex-direction: column !important;
     padding-top: 68px;
+    /* Use the stable small-viewport height so the bottom tab bar stays pinned
+       to the bottom — `dvh` fluctuates with iOS Safari's toolbars and leaves
+       the menu floating with a gap below it. */
+    height: 100svh !important;
   }
 
   .layout-panel {
