@@ -41,25 +41,12 @@ function originGsap(config) {
 }
 
 function cssEase(config) {
-  if (config.easing === 'custom') {
-    const [a, b, c, d] = config.customEase ?? [0.4, 0, 0.2, 1]
-    return `cubic-bezier(${a}, ${b}, ${c}, ${d})`
-  }
   return EASING_TO_CSS[config.easing] ?? 'ease-in-out'
 }
 
-// GSAP ease as a code string. Custom eases reference a CustomEase created in the header.
+// GSAP ease as a code string.
 function gsapEase(config) {
-  return config.easing === 'custom' ? 'customEase' : `'${config.easing}'`
-}
-function gsapCustomEaseHeader(config) {
-  if (config.easing !== 'custom') return ''
-  const [a, b, c, d] = config.customEase ?? [0.4, 0, 0.2, 1]
-  return `import { CustomEase } from 'gsap/CustomEase'
-gsap.registerPlugin(CustomEase)
-
-const customEase = CustomEase.create('custom', 'M0,0 C${a},${b} ${c},${d} 1,1')
-`
+  return `'${config.easing}'`
 }
 
 function cssIterations(config) {
@@ -90,7 +77,7 @@ function gsapReverse(varName, config) {
 }
 
 export function generateCSS(config) {
-  const { type, duration, strokeColor, strokeWidth, stagger, intensity } = config
+  const { type, duration, strokeWidth, stagger, intensity } = config
   const ease = cssEase(config)
   const iter = cssIterations(config)
   const dir  = cssDirection(config)
@@ -110,7 +97,7 @@ export function generateCSS(config) {
 .icon polyline,
 .icon polygon {
   fill: none;
-  stroke: ${strokeColor};
+  /* Icon keeps its own stroke colour — add a stroke value if yours is fill-based */
   stroke-width: ${strokeWidth}px;
   stroke-dasharray: var(--len, 200);
   stroke-dashoffset: var(--len, 200);
@@ -227,14 +214,14 @@ export function generateCSS(config) {
 }
 
 export function generateGSAP(config) {
-  const { type, duration, delay, stagger, strokeColor, strokeWidth, intensity, repeatDelay } = config
+  const { type, duration, delay, stagger, strokeWidth, intensity, repeatDelay } = config
   const repeat = gsapRepeat(config)
   const ease = gsapEase(config)
   const org = originGsap(config)
   const rd = repeatDelay || 0
 
   const header = `import gsap from 'gsap'
-${gsapCustomEaseHeader(config)}
+
 const icon = document.querySelector('.icon') // your SVG element
 `
 
@@ -247,7 +234,7 @@ const paths = icon.querySelectorAll('path, circle, rect, ellipse, line, polyline
 paths.forEach((el) => {
   const len = el.getTotalLength()
   el.style.fill = 'none'
-  el.style.stroke = '${strokeColor}'
+  // Icon keeps its own stroke colour — set el.style.stroke here if yours is fill-based
   el.style.strokeWidth = '${strokeWidth}px'
   el.style.strokeDasharray = len
   el.style.strokeDashoffset = len
@@ -375,7 +362,7 @@ const anim = gsap.to(icon, {
  * @returns {string|null}          - Serialized SVG string, or null on parse error
  */
 export function generateEmbeddedSVG(liveSvgEl, svgString, config) {
-  const { type, duration, delay, stagger, intensity, strokeColor, strokeWidth } = config
+  const { type, duration, delay, stagger, intensity, strokeWidth } = config
 
   const ease = cssEase(config)
   const iter = cssIterations(config)
@@ -397,12 +384,20 @@ export function generateEmbeddedSVG(liveSvgEl, svgString, config) {
     const freshEls = [...svg.querySelectorAll(EL_SELECTOR)]
 
     freshEls.forEach((el, i) => {
-      const len = liveEls[i]?.getTotalLength ? liveEls[i].getTotalLength() : 200
+      const live = liveEls[i]
+      const len = live?.getTotalLength ? live.getTotalLength() : 200
       const cls = `_sa${i}`
       el.setAttribute('class', [el.getAttribute('class'), cls].filter(Boolean).join(' '))
       el.setAttribute('fill', 'none')
-      el.setAttribute('stroke', strokeColor)
-      el.setAttribute('stroke-width', strokeWidth)
+      // Preserve the icon's own colour: keep the existing stroke for line icons,
+      // fall back to the fill colour for fill-based icons.
+      const cs = live ? getComputedStyle(live) : null
+      const stroked = cs && cs.stroke && cs.stroke !== 'none' && cs.stroke !== 'rgba(0, 0, 0, 0)'
+      if (!stroked) {
+        const fill = cs && cs.fill && cs.fill !== 'none' && cs.fill !== 'rgba(0, 0, 0, 0)' ? cs.fill : 'currentColor'
+        el.setAttribute('stroke', fill)
+        el.setAttribute('stroke-width', strokeWidth)
+      }
       el.setAttribute('stroke-dasharray', len)
       el.setAttribute('stroke-dashoffset', len)
       const d = ((i * stagger) + delay).toFixed(2)

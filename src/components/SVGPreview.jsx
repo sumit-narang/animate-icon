@@ -1,22 +1,10 @@
 import { useEffect, useLayoutEffect, useRef } from 'react'
 import gsap from 'gsap'
-import { CustomEase } from 'gsap/CustomEase'
 import { captureGIF, captureWebM } from '../utils/captureGIF'
 import { generateEmbeddedSVG, ORIGIN_GSAP } from '../utils/codeGenerators'
 
-gsap.registerPlugin(CustomEase)
-
 function sanitizeSVG(svgString) {
   return svgString.replace(/<script[\s\S]*?<\/script>/gi, '')
-}
-
-// Resolve config easing to something GSAP accepts (a name string or a CustomEase).
-function resolveEase(config) {
-  if (config.easing === 'custom') {
-    const [a, b, c, d] = config.customEase ?? [0.4, 0, 0.2, 1]
-    return CustomEase.create('sa-custom', `M0,0 C${a},${b} ${c},${d} 1,1`)
-  }
-  return config.easing
 }
 
 function getAnimatableEls(svgEl) {
@@ -36,13 +24,13 @@ function resetStyles(svgEl) {
 }
 
 function buildAnimation(svgEl, config) {
-  const { type, duration, loop, yoyo, delay, stagger, intensity, strokeColor, strokeWidth } = config
+  const { type, duration, loop, yoyo, delay, stagger, intensity, strokeWidth } = config
   const els = getAnimatableEls(svgEl)
   if (!els.length) return null
 
   const repeat      = loop ? -1 : (config.repeat ?? 0)
   const repeatDelay = config.repeatDelay ?? 0
-  const ease        = resolveEase(config)
+  const ease        = config.easing
   const origin      = ORIGIN_GSAP[config.origin] ?? '50% 50%'
   // bounce/pulse have their there-and-back baked in via yoyo, so one user "repeat" = one full cycle
   const cycleRepeat = loop ? -1 : (config.repeat ?? 0) * 2 + 1
@@ -57,9 +45,16 @@ function buildAnimation(svgEl, config) {
     case 'draw': {
       els.forEach((el) => {
         const len = el.getTotalLength ? el.getTotalLength() : 200
+        const cs = getComputedStyle(el)
+        const stroked = cs.stroke && cs.stroke !== 'none' && cs.stroke !== 'rgba(0, 0, 0, 0)'
+        // Keep line icons' own stroke; for fill-based icons draw the outline in
+        // their own fill colour — never force a colour of our own.
+        if (!stroked) {
+          const fill = cs.fill && cs.fill !== 'none' && cs.fill !== 'rgba(0, 0, 0, 0)' ? cs.fill : 'currentColor'
+          el.style.stroke = fill
+          el.style.strokeWidth = strokeWidth + 'px'
+        }
         el.style.fill = 'none'
-        el.style.stroke = strokeColor
-        el.style.strokeWidth = strokeWidth + 'px'
         el.style.strokeDasharray = len
         el.style.strokeDashoffset = len
       })

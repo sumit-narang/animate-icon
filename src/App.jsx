@@ -7,10 +7,9 @@ import ExportPanel from './components/ExportPanel'
 import MobilePanel from './components/MobilePanel'
 
 const DEFAULT_CONFIG = {
-  type: 'spin',
+  type: 'draw',
   trigger: 'auto',
   easing: 'power2.inOut',
-  customEase: [0.4, 0, 0.2, 1], // cubic-bezier control points (used when easing === 'custom')
   origin: 'center',             // transform-origin anchor for rotate/scale animations
   duration: 1.2,
   delay: 0,
