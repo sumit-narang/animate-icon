@@ -110,6 +110,14 @@ html, body {
   transform: translateY(-50%);
 }
 
+/* On mobile the light-grey placeholder icon reads as disabled — make it black
+   to match the header upload icon. */
+@media (max-width: 767px) {
+  .upload-empty-state img {
+    filter: brightness(0);
+  }
+}
+
 /* Make uploaded SVGs fill the preview container */
 #svg-preview-container svg {
   width: 100%;

@@ -64,7 +64,7 @@ export default function App() {
             onClick={() => canvasInputRef.current?.click()}
             style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', marginRight: '8px' }}
           >
-            <img src={import.meta.env.BASE_URL + 'upload.svg'} alt="Upload" style={{ width: 'auto', height: '21px', display: 'block' }} />
+            <img src={import.meta.env.BASE_URL + 'upload.svg'} alt="Upload" style={{ width: 'auto', height: '21px', display: 'block', filter: 'brightness(0)' }} />
           </button>
           <button
             onClick={isPlaying ? handlePause : handlePlay}
