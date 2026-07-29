@@ -180,7 +180,7 @@ export default function App() {
 
             {!svgString && (
               <div
-                style={{ position: 'absolute', inset: 0, cursor: 'pointer', userSelect: 'none' }}
+                style={{ position: 'absolute', inset: 0, cursor: 'pointer', userSelect: 'none', WebkitTapHighlightColor: 'transparent' }}
                 onClick={() => canvasInputRef.current?.click()}
                 onDragOver={(e) => { e.preventDefault(); setCanvasDragging(true) }}
                 onDragLeave={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setCanvasDragging(false) }}

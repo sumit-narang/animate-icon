@@ -104,17 +104,10 @@ html, body {
   }
 }
 
-/* Upload empty state — centered on desktop, fixed offset on mobile */
+/* Upload empty state — vertically centered within the canvas */
 .upload-empty-state {
   top: 50%;
   transform: translateY(-50%);
-}
-
-@media (max-width: 767px) {
-  .upload-empty-state {
-    top: 32vh;
-    transform: none;
-  }
 }
 
 /* Make uploaded SVGs fill the preview container */
